@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 
 // Route files
 const categories = require('./routes/categories');
+const books = require('./routes/books');
 
 // Load env vars
 dotenv.config();
@@ -19,6 +20,7 @@ app.use(cors());
 
 // Mount routers
 app.use('/api/categories', categories);
+app.use('/api/books', books);
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/bookstore';
