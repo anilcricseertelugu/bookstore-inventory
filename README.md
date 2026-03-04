@@ -1,6 +1,6 @@
 # 📚 BookStore — Inventory & Order Management System
 
-A full-stack **MERN** (MongoDB, Express, React, Node.js) application for managing a bookstore's inventory and orders. The project follows a **split deployment** architecture — `backend` and `frontend` are independent services in the same repository.
+A full-stack **MERN** (MongoDB, Express, React, Node.js) application for managing a bookstore's inventory, customers, and orders. The project follows a **split deployment** architecture — `backend` and `frontend` are independent services in the same repository.
 
 ---
 
@@ -11,16 +11,19 @@ solitary-stellar/
 ├── backend/
 │   ├── models/
 │   │   ├── Category.js     # Mongoose schema for book categories
-│   │   └── Book.js         # Mongoose schema for books (refs Category)
+│   │   ├── Book.js         # Mongoose schema for books (refs Category)
+│   │   └── Customer.js     # Mongoose schema for customers (auto ID)
 │   ├── routes/
 │   │   ├── categories.js   # CRUD API for categories
-│   │   └── books.js        # CRUD API for books
+│   │   ├── books.js        # CRUD API for books
+│   │   └── customers.js    # CRUD API for customers (search support)
 │   └── server.js           # Express entry point
 ├── frontend/
 │   └── src/
 │       ├── pages/
 │       │   ├── Books.jsx       # Book inventory page (table + inline form)
-│       │   └── Categories.jsx  # Category management page (cards + inline form)
+│       │   ├── Categories.jsx  # Category management page (cards + inline form)
+│       │   └── Customers.jsx   # Customer management page (table + inline form)
 │       ├── App.jsx             # Sidebar layout + page routing
 │       └── index.css           # Global design system (warm cream theme)
 └── README.md
@@ -46,11 +49,20 @@ solitary-stellar/
 - Stock badges (green = healthy, red = low ≤ 5)
 - Inline edit form expands beneath the selected table row
 
+### Phase 3 — Customer Management ✅
+- Add, edit, delete customers
+- **Auto-generated Customer ID** (`CST-XXXX`) issued to every customer — allows identification without requiring personal details
+- Mandatory: Name only. Optional: Phone, Email, Address, Staff Notes
+- Real-time search across name, phone, email, and Customer ID
+- Duplicate phone/email detection with user-friendly error messages
+- Customer ID displayed as a copyable monospace badge
+
 ### UI Design
 - Warm cream/white light theme with amber-gold accent
 - Fixed sidebar navigation with **Playfair Display** serif brand font and **Inter** for UI
 - No modal dialogs — all forms expand inline within the page
 - Sticky topbar with page title and live count chip
+
 
 ---
 
@@ -180,13 +192,54 @@ Base URL: `http://localhost:5000/api`
 
 ---
 
+### Customers
+
+| Method | Endpoint          | Description                                  |
+|--------|-------------------|----------------------------------------------|
+| GET    | `/customers`      | Fetch all customers (`?search=` for search)  |
+| GET    | `/customers/:id`  | Fetch single customer                        |
+| POST   | `/customers`      | Create customer (auto-generates Customer ID) |
+| PUT    | `/customers/:id`  | Update customer                              |
+| DELETE | `/customers/:id`  | Delete customer                              |
+
+**Customer object:**
+```json
+{
+  "_id": "...",
+  "customerId": "CST-A3F9",
+  "name": "Ravi Kumar",
+  "phone": "9876543210",
+  "email": "ravi@example.com",
+  "address": "123 Main St, Hyderabad",
+  "notes": "Prefers Telugu fiction",
+  "createdAt": "2026-03-04T14:30:00.000Z"
+}
+```
+
+**Create / Update payload** (`name` is the only required field):
+```json
+{
+  "name": "Ravi Kumar",
+  "phone": "9876543210",
+  "email": "ravi@example.com",
+  "address": "123 Main St, Hyderabad",
+  "notes": "Prefers Telugu fiction"
+}
+```
+
+> `customerId` is auto-generated on creation and cannot be updated.
+
+---
+
 ## 🗺 Roadmap
+
 
 - [x] Phase 1 — Book Category Management
 - [x] Phase 2 — Book Inventory Management
-- [ ] Phase 3 — Order Management
-- [ ] Phase 4 — User Authentication & Roles
-- [ ] Phase 5 — Reports & Dashboard
+- [x] Phase 3 — Customer Management
+- [ ] Phase 4 — Order Management
+- [ ] Phase 5 — User Authentication & Roles
+- [ ] Phase 6 — Reports & Dashboard
 
 ---
 

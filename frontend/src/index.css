@@ -862,3 +862,42 @@ td>.inline-form-panel {
   border-bottom: none;
   box-shadow: none;
 }
+
+/* ── Customer ID badge ── */
+.customer-id-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  background: var(--accent-light);
+  border: 1px solid rgba(180, 83, 9, 0.25);
+  border-radius: var(--r-sm);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* ── Customer ID info tip ── */
+.customer-id-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: var(--accent-light);
+  border: 1px solid rgba(180, 83, 9, 0.2);
+  border-radius: var(--r-md);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.8rem;
+  color: var(--accent-hover);
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+.customer-id-tip code {
+  background: rgba(180, 83, 9, 0.12);
+  padding: 0.05em 0.35em;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.8em;
+}

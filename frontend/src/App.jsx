@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import BooksPage from './pages/Books';
 import CategoriesPage from './pages/Categories';
+import CustomersPage from './pages/Customers';
 import './index.css';
+
 
 export default function App() {
   const [page, setPage] = useState('books');
@@ -30,6 +32,14 @@ export default function App() {
             <span className="nav-icon">🏷️</span>
             Categories
           </button>
+          <div className="sidebar-label" style={{ marginTop: '1.25rem' }}>Customers</div>
+          <button
+            className={`nav-item ${page === 'customers' ? 'active' : ''}`}
+            onClick={() => setPage('customers')}
+          >
+            <span className="nav-icon">👤</span>
+            Customers
+          </button>
         </nav>
       </aside>
 
@@ -37,6 +47,7 @@ export default function App() {
       <div className="main-area">
         {page === 'books' && <BooksPage />}
         {page === 'categories' && <CategoriesPage />}
+        {page === 'customers' && <CustomersPage />}
       </div>
     </div>
   );
