@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-const API_URL = 'http://localhost:5000/api/categories';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = `${BASE_URL}/api/categories`;
 
 const PRESET_COLORS = [
     '#b45309', '#7c3aed', '#be185d', '#dc2626',

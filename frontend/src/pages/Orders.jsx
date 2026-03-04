@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-const API_BOOKS = 'http://localhost:5000/api/books';
-const API_CUSTOMERS = 'http://localhost:5000/api/customers';
-const API_ORDERS = 'http://localhost:5000/api/orders';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BOOKS = `${BASE_URL}/api/books`;
+const API_CUSTOMERS = `${BASE_URL}/api/customers`;
+const API_ORDERS = `${BASE_URL}/api/orders`;
 
 /* ══════════════════════════════════════
    Customer Search

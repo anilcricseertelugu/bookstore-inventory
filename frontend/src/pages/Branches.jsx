@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-const API = 'http://localhost:5000/api/branches';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = `${BASE_URL}/api/branches`;
 
 function BranchForm({ initial, onSave, onCancel, authHeaders }) {
     const [form, setForm] = useState({

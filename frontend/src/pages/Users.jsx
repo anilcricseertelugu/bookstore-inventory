@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-const API_USERS = 'http://localhost:5000/api/users';
-const API_BRANCHES = 'http://localhost:5000/api/branches';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_USERS = `${BASE_URL}/api/users`;
+const API_BRANCHES = `${BASE_URL}/api/branches`;
 
 function UserForm({ initial, branches, onSave, onCancel }) {
     const [form, setForm] = useState({

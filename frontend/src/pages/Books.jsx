@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-const API_BOOKS = 'http://localhost:5000/api/books';
-const API_CATS = 'http://localhost:5000/api/categories';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BOOKS = `${BASE_URL}/api/books`;
+const API_CATS = `${BASE_URL}/api/categories`;
 
 const PRESET_COLORS = [
     '#b45309', '#7c3aed', '#be185d', '#dc2626',

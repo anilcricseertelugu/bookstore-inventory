@@ -30,21 +30,10 @@ app.use('/api/orders', orders);
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/bookstore';
 
-// Seed owner account on startup
-async function seedOwner() {
-    const User = require('./models/User');
-    const existing = await User.findOne({ username: 'admin' });
-    if (!existing) {
-        await User.create({ username: 'admin', password: 'admin123', role: 'owner' });
-        console.log('✓ Owner account created: admin / admin123');
-    }
-}
-
 const startServer = async () => {
     try {
         await mongoose.connect(MONGO_URI);
         console.log('MongoDB Connected...');
-        await seedOwner();
         app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     } catch (err) {
         console.error(`Error: ${err.message}`);

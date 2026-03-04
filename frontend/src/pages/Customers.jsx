@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-const API = 'http://localhost:5000/api/customers';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = `${BASE_URL}/api/customers`;
 
 /* ── Inline Customer Form ── */
 function CustomerForm({ initial, onSave, onCancel }) {
