@@ -12,18 +12,21 @@ solitary-stellar/
 │   ├── models/
 │   │   ├── Category.js     # Mongoose schema for book categories
 │   │   ├── Book.js         # Mongoose schema for books (refs Category)
-│   │   └── Customer.js     # Mongoose schema for customers (auto ID)
+│   │   ├── Customer.js     # Mongoose schema for customers (auto ID)
+│   │   └── Order.js        # Mongoose schema for orders (auto ID, line items)
 │   ├── routes/
 │   │   ├── categories.js   # CRUD API for categories
 │   │   ├── books.js        # CRUD API for books
-│   │   └── customers.js    # CRUD API for customers (search support)
+│   │   ├── customers.js    # CRUD API for customers (search support)
+│   │   └── orders.js       # CRUD API for orders (stock validate + deduct)
 │   └── server.js           # Express entry point
 ├── frontend/
 │   └── src/
 │       ├── pages/
 │       │   ├── Books.jsx       # Book inventory page (table + inline form)
 │       │   ├── Categories.jsx  # Category management page (cards + inline form)
-│       │   └── Customers.jsx   # Customer management page (table + inline form)
+│       │   ├── Customers.jsx   # Customer management page (table + inline form)
+│       │   └── Orders.jsx      # Orders / sales page (cart + payment panel)
 │       ├── App.jsx             # Sidebar layout + page routing
 │       └── index.css           # Global design system (warm cream theme)
 └── README.md
@@ -56,6 +59,17 @@ solitary-stellar/
 - Real-time search across name, phone, email, and Customer ID
 - Duplicate phone/email detection with user-friendly error messages
 - Customer ID displayed as a copyable monospace badge
+
+### Phase 4 — Order Management ✅
+- Record walk-in sales with optional customer linkage
+- **Auto-generated Order ID** (`ORD-XXXX`) for every sale
+- Multi-book cart with live stock display (green / amber / red badges)
+- Quantity capped at available stock — out-of-stock books cannot be added
+- Stock validated server-side before any deduction; entire order rejected if any book is short
+- Inventory auto-deducted on order confirmation
+- **Amount Received** field supports discounts — discount auto-calculated
+- Delete order restores stock automatically
+- Topbar chips: total sales count, total revenue received, total discounts given
 
 ### UI Design
 - Warm cream/white light theme with amber-gold accent
@@ -231,13 +245,58 @@ Base URL: `http://localhost:5000/api`
 
 ---
 
-## 🗺 Roadmap
+### Orders
 
+| Method | Endpoint          | Description                              |
+|--------|-------------------|------------------------------------------|
+| GET    | `/orders`         | All orders, newest first                 |
+| GET    | `/orders/:id`     | Single order                             |
+| POST   | `/orders`         | Create sale + validate & deduct stock    |
+| DELETE | `/orders/:id`     | Delete sale + restore stock              |
+
+**Order object:**
+```json
+{
+  "_id": "...",
+  "orderId": "ORD-G7KX",
+  "customer": "<customer_id or null>",
+  "customerId": "CST-A3F9",
+  "customerName": "Ravi Kumar",
+  "customerPhone": "9876543210",
+  "items": [
+    { "bookTitle": "Dune", "language": "English", "unitPrice": 499, "quantity": 2, "subtotal": 998 }
+  ],
+  "totalAmount": 998,
+  "amountReceived": 950,
+  "discount": 48,
+  "notes": "",
+  "createdAt": "2026-03-04T16:00:00.000Z"
+}
+```
+
+**Create payload** (only `items` and `amountReceived` required):
+```json
+{
+  "items": [{ "bookId": "<book_id>", "quantity": 2 }],
+  "amountReceived": 950,
+  "customer": "<customer_id>",
+  "customerId": "CST-A3F9",
+  "customerName": "Ravi Kumar",
+  "customerPhone": "9876543210",
+  "notes": "Regular customer, gave loyalty discount"
+}
+```
+
+> Stock validation runs server-side. If any book has insufficient stock, the entire order is rejected before any deduction occurs.
+
+---
+
+## 🗺 Roadmap
 
 - [x] Phase 1 — Book Category Management
 - [x] Phase 2 — Book Inventory Management
 - [x] Phase 3 — Customer Management
-- [ ] Phase 4 — Order Management
+- [x] Phase 4 — Order Management (Walk-in Sales)
 - [ ] Phase 5 — User Authentication & Roles
 - [ ] Phase 6 — Reports & Dashboard
 

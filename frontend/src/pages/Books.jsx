@@ -10,10 +10,16 @@ const PRESET_COLORS = [
 
 const currentYear = new Date().getFullYear();
 
+const LANGUAGES = [
+    'English', 'Telugu', 'Hindi', 'Tamil', 'Kannada', 'Malayalam',
+    'Bengali', 'Marathi', 'Gujarati', 'Punjabi', 'Urdu', 'Sanskrit',
+    'French', 'German', 'Spanish', 'Japanese', 'Chinese', 'Arabic', 'Other',
+];
+
 const EMPTY_FORM = {
     title: '', author: '', isbn: '', description: '',
     publishedYear: '', price: '', quantity: 0,
-    categories: [], coverColor: '#b45309',
+    language: 'English', categories: [], coverColor: '#b45309',
 };
 
 /* ── Inline Book Form ── */
@@ -26,6 +32,7 @@ function BookForm({ initial, categories, onSave, onCancel }) {
         publishedYear: initial.publishedYear || '',
         price: initial.price ?? '',
         quantity: initial.quantity ?? 0,
+        language: initial.language || 'English',
         categories: initial.categories?.map(c => c._id || c) || [],
         coverColor: initial.coverColor || '#b45309',
     } : { ...EMPTY_FORM });
@@ -46,6 +53,7 @@ function BookForm({ initial, categories, onSave, onCancel }) {
         setError('');
         if (!form.title.trim()) return setError('Title is required.');
         if (!form.author.trim()) return setError('Author is required.');
+        if (!form.language) return setError('Language is required.');
         if (form.price === '' || Number(form.price) < 0) return setError('Enter a valid price.');
         setSaving(true);
         try {
@@ -55,6 +63,7 @@ function BookForm({ initial, categories, onSave, onCancel }) {
                 description: form.description.trim(),
                 publishedYear: form.publishedYear ? Number(form.publishedYear) : null,
                 price: Number(form.price), quantity: Number(form.quantity),
+                language: form.language,
                 categories: form.categories, coverColor: form.coverColor,
             });
         } catch (err) { setError(err.message); }
@@ -79,6 +88,12 @@ function BookForm({ initial, categories, onSave, onCancel }) {
                     <div className="field">
                         <label>Author *</label>
                         <input placeholder="e.g. Frank Herbert" value={form.author} onChange={e => set('author', e.target.value)} required />
+                    </div>
+                    <div className="field field-narrow">
+                        <label>Language *</label>
+                        <select value={form.language} onChange={e => set('language', e.target.value)} required>
+                            {LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
+                        </select>
                     </div>
                     <div className="field field-narrow">
                         <label>Published Year</label>
@@ -178,6 +193,7 @@ function BookRow({ book, editing, onEdit, onDelete }) {
                 {book.title}
             </td>
             <td>{book.author}</td>
+            <td>{book.language || '—'}</td>
             <td>{book.publishedYear || '—'}</td>
             <td>
                 {book.categories?.length > 0
@@ -328,6 +344,7 @@ export default function Books() {
                                     <tr>
                                         <th>Title</th>
                                         <th>Author</th>
+                                        <th>Language</th>
                                         <th>Year</th>
                                         <th>Categories</th>
                                         <th>Price</th>
@@ -347,7 +364,7 @@ export default function Books() {
                                             {/* Inline edit row */}
                                             {editBook?._id === b._id && (
                                                 <tr>
-                                                    <td colSpan={7} style={{ padding: 0, background: 'var(--cream)' }}>
+                                                    <td colSpan={8} style={{ padding: 0, background: 'var(--cream)' }}>
                                                         <BookForm
                                                             initial={editBook}
                                                             categories={cats}

@@ -13,6 +13,12 @@ const BookSchema = new mongoose.Schema({
         trim: true,
         maxlength: [100, 'Author name cannot be more than 100 characters']
     },
+    language: {
+        type: String,
+        required: [true, 'Please select a language'],
+        trim: true,
+        default: 'English'
+    },
     isbn: {
         type: String,
         trim: true,
