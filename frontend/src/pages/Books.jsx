@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const API_BOOKS = 'http://localhost:5000/api/books';
 const API_CATS = 'http://localhost:5000/api/categories';
@@ -54,6 +55,7 @@ function BookForm({ initial, categories, onSave, onCancel }) {
         if (!form.title.trim()) return setError('Title is required.');
         if (!form.author.trim()) return setError('Author is required.');
         if (!form.language) return setError('Language is required.');
+        if (form.categories.length === 0) return setError('Please select a category.');
         if (form.price === '' || Number(form.price) < 0) return setError('Enter a valid price.');
         setSaving(true);
         try {
@@ -124,27 +126,26 @@ function BookForm({ initial, categories, onSave, onCancel }) {
                 </div>
 
                 <div className="field-row align-center">
-                    {/* Categories */}
+                    {/* Category */}
                     <div className="field" style={{ flex: 2 }}>
-                        <label>Categories</label>
-                        {categories.length === 0
-                            ? <p style={{ fontSize: '0.82rem', color: 'var(--ink-muted)' }}>No categories yet.</p>
-                            : <div className="cat-checkbox-grid">
-                                {categories.map(cat => (
-                                    <label key={cat._id}
-                                        className={`cat-check-item ${form.categories.includes(cat._id) ? 'checked' : ''}`}>
-                                        <input type="checkbox" checked={form.categories.includes(cat._id)}
-                                            onChange={() => toggleCat(cat._id)} />
-                                        <span style={{
-                                            width: 8, height: 8, borderRadius: '50%', background: cat.colorTag,
-                                            display: 'inline-block', flexShrink: 0
-                                        }} />
-                                        <span>{cat.name}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        }
+                        <label>Category *</label>
+                        <select
+                            value={form.categories[0] || ''}
+                            onChange={e => set('categories', [e.target.value])}
+                            required
+                        >
+                            <option value="" disabled>Select a category…</option>
+                            {categories.map(cat => (
+                                <option key={cat._id} value={cat._id}>{cat.name}</option>
+                            ))}
+                        </select>
+                        {categories.length === 0 && (
+                            <p style={{ fontSize: '0.8rem', color: 'var(--red)', marginTop: '0.25rem' }}>
+                                No categories found. Please create a category first.
+                            </p>
+                        )}
                     </div>
+
 
                     {/* Color */}
                     <div className="field" style={{ flex: 1 }}>
@@ -238,6 +239,7 @@ function BookRow({ book, editing, onEdit, onDelete }) {
 
 /* ── Books Page ── */
 export default function Books() {
+    const { authHeaders } = useAuth();
     const [books, setBooks] = useState([]);
     const [cats, setCats] = useState([]);
     const [search, setSearch] = useState('');
@@ -249,7 +251,10 @@ export default function Books() {
     const fetchAll = async () => {
         setLoading(true);
         try {
-            const [bRes, cRes] = await Promise.all([fetch(API_BOOKS), fetch(API_CATS)]);
+            const [bRes, cRes] = await Promise.all([
+                fetch(API_BOOKS, { headers: authHeaders() }),
+                fetch(API_CATS, { headers: authHeaders() })
+            ]);
             const [bData, cData] = await Promise.all([bRes.json(), cRes.json()]);
             if (bData.success) setBooks(bData.data);
             if (cData.success) setCats(cData.data);
@@ -267,7 +272,7 @@ export default function Books() {
         const url = editBook ? `${API_BOOKS}/${editBook._id}` : API_BOOKS;
         const res = await fetch(url, {
             method: editBook ? 'PUT' : 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders(),
             body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -276,7 +281,7 @@ export default function Books() {
     };
 
     const handleDelete = async (id) => {
-        await fetch(`${API_BOOKS}/${id}`, { method: 'DELETE' });
+        await fetch(`${API_BOOKS}/${id}`, { method: 'DELETE', headers: authHeaders() });
         fetchAll();
     };
 

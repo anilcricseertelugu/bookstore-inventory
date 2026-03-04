@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const API_BOOKS = 'http://localhost:5000/api/books';
 const API_CUSTOMERS = 'http://localhost:5000/api/customers';
@@ -7,7 +8,7 @@ const API_ORDERS = 'http://localhost:5000/api/orders';
 /* ══════════════════════════════════════
    Customer Search
 ══════════════════════════════════════ */
-function CustomerSearch({ selected, onSelect, onClear }) {
+function CustomerSearch({ selected, onSelect, onClear, authHeaders }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
 
@@ -15,7 +16,7 @@ function CustomerSearch({ selected, onSelect, onClear }) {
         if (!query.trim()) { setResults([]); return; }
         const t = setTimeout(async () => {
             try {
-                const res = await fetch(`${API_CUSTOMERS}?search=${encodeURIComponent(query)}`);
+                const res = await fetch(`${API_CUSTOMERS}?search=${encodeURIComponent(query)}`, { headers: authHeaders() });
                 const data = await res.json();
                 if (data.success) setResults(data.data.slice(0, 8));
             } catch (e) { console.error(e); }
@@ -78,7 +79,7 @@ function CustomerSearch({ selected, onSelect, onClear }) {
 /* ══════════════════════════════════════
    Book Search (per order)
 ══════════════════════════════════════ */
-function BookSearch({ onAdd, cartBookIds }) {
+function BookSearch({ onAdd, cartBookIds, authHeaders }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -88,7 +89,7 @@ function BookSearch({ onAdd, cartBookIds }) {
         const t = setTimeout(async () => {
             setLoading(true);
             try {
-                const res = await fetch(API_BOOKS);
+                const res = await fetch(API_BOOKS, { headers: authHeaders() });
                 const data = await res.json();
                 if (data.success) {
                     const q = query.toLowerCase();
@@ -178,7 +179,7 @@ function CartItem({ item, onQtyChange, onRemove }) {
 /* ══════════════════════════════════════
    New Order / Sale Form
 ══════════════════════════════════════ */
-function OrderForm({ onSave, onCancel }) {
+function OrderForm({ onSave, onCancel, authHeaders }) {
     const [customer, setCustomer] = useState(null);
     const [cart, setCart] = useState([]);
     const [amountReceived, setAmt] = useState('');
@@ -240,13 +241,13 @@ function OrderForm({ onSave, onCancel }) {
                 {/* Customer */}
                 <div className="field">
                     <label>Customer <span style={{ fontWeight: 400, color: 'var(--ink-muted)' }}>(optional — leave blank for walk-in)</span></label>
-                    <CustomerSearch selected={customer} onSelect={setCustomer} onClear={() => setCustomer(null)} />
+                    <CustomerSearch selected={customer} onSelect={setCustomer} onClear={() => setCustomer(null)} authHeaders={authHeaders} />
                 </div>
 
                 {/* Book picker */}
                 <div className="field" style={{ marginTop: '0.75rem' }}>
                     <label>Add Books *</label>
-                    <BookSearch onAdd={addBook} cartBookIds={cart.map(i => i.bookId)} />
+                    <BookSearch onAdd={addBook} cartBookIds={cart.map(i => i.bookId)} authHeaders={authHeaders} />
                 </div>
 
                 {/* Cart */}
@@ -366,6 +367,7 @@ function OrderRow({ order, onDelete }) {
    Orders Page
 ══════════════════════════════════════ */
 export default function Orders() {
+    const { authHeaders } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showForm, setShowForm] = useState(false);
@@ -373,7 +375,7 @@ export default function Orders() {
     const fetchAll = async () => {
         setLoading(true);
         try {
-            const res = await fetch(API_ORDERS);
+            const res = await fetch(API_ORDERS, { headers: authHeaders() });
             const data = await res.json();
             if (data.success) setOrders(data.data);
         } catch (e) { console.error(e); }
@@ -385,7 +387,7 @@ export default function Orders() {
     const handleSave = async (payload) => {
         const res = await fetch(API_ORDERS, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders(),
             body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -395,7 +397,7 @@ export default function Orders() {
     };
 
     const handleDelete = async (id) => {
-        await fetch(`${API_ORDERS}/${id}`, { method: 'DELETE' });
+        await fetch(`${API_ORDERS}/${id}`, { method: 'DELETE', headers: authHeaders() });
         fetchAll();
     };
 
@@ -425,7 +427,7 @@ export default function Orders() {
             </div>
 
             <div className="page-content">
-                {showForm && <OrderForm onSave={handleSave} onCancel={() => setShowForm(false)} />}
+                {showForm && <OrderForm onSave={handleSave} onCancel={() => setShowForm(false)} authHeaders={authHeaders} />}
 
                 {loading ? (
                     <p style={{ color: 'var(--ink-muted)' }}>Loading…</p>

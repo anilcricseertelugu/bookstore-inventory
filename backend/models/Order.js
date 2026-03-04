@@ -40,6 +40,11 @@ const OrderSchema = new mongoose.Schema({
     amountReceived: { type: Number, required: true },
     discount: { type: Number, default: 0 },
     notes: { type: String, default: '' },
+    branch: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Branch',
+        required: true
+    },
     createdAt: { type: Date, default: Date.now }
 });
 

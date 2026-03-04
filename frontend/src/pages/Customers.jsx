@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const API = 'http://localhost:5000/api/customers';
 
@@ -133,6 +134,7 @@ function CustomerRow({ customer, editingId, onEdit, onDelete }) {
 
 /* ── Customers Page ── */
 export default function Customers() {
+    const { authHeaders } = useAuth();
     const [customers, setCustomers] = useState([]);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
@@ -143,7 +145,7 @@ export default function Customers() {
         setLoading(true);
         try {
             const url = q ? `${API}?search=${encodeURIComponent(q)}` : API;
-            const res = await fetch(url);
+            const res = await fetch(url, { headers: authHeaders() });
             const data = await res.json();
             if (data.success) setCustomers(data.data);
         } catch (e) { console.error(e); }
@@ -166,7 +168,7 @@ export default function Customers() {
         const url = editCustomer ? `${API}/${editCustomer._id}` : API;
         const res = await fetch(url, {
             method: editCustomer ? 'PUT' : 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders(),
             body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -175,7 +177,7 @@ export default function Customers() {
     };
 
     const handleDelete = async (id) => {
-        await fetch(`${API}/${id}`, { method: 'DELETE' });
+        await fetch(`${API}/${id}`, { method: 'DELETE', headers: authHeaders() });
         fetchAll(search);
     };
 

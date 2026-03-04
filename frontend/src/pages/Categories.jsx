@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = 'http://localhost:5000/api/categories';
 
@@ -116,6 +117,7 @@ function CatCard({ cat, onEdit, onDelete }) {
 
 /* ── Categories Page ── */
 export default function Categories() {
+    const { authHeaders } = useAuth();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showForm, setShowForm] = useState(false);
@@ -124,7 +126,7 @@ export default function Categories() {
     const fetchAll = async () => {
         setLoading(true);
         try {
-            const res = await fetch(API_URL);
+            const res = await fetch(API_URL, { headers: authHeaders() });
             const data = await res.json();
             if (data.success) setCategories(data.data);
         } catch (e) { console.error(e); }
@@ -141,7 +143,7 @@ export default function Categories() {
         const url = editCat ? `${API_URL}/${editCat._id}` : API_URL;
         const res = await fetch(url, {
             method: editCat ? 'PUT' : 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders(),
             body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -150,7 +152,7 @@ export default function Categories() {
     };
 
     const handleDelete = async (id) => {
-        await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        await fetch(`${API_URL}/${id}`, { method: 'DELETE', headers: authHeaders() });
         fetchAll();
     };
 

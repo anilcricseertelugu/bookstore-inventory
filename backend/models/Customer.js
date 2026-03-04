@@ -46,6 +46,11 @@ const CustomerSchema = new mongoose.Schema({
         maxlength: [500, 'Notes cannot exceed 500 characters'],
         default: ''
     },
+    branch: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Branch',
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now

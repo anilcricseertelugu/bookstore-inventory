@@ -52,6 +52,11 @@ const BookSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Category'
     }],
+    branch: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Branch',
+        required: true
+    },
     coverColor: {
         type: String,
         default: '#6366f1'
